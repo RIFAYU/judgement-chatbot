@@ -3,56 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LawGPT</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <title>Prompt Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+    <style>
+        .loader {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .spinner-border {
+            border-top-color: #3498db;
+            border-right-color: transparent;
+            border-bottom-color: transparent;
+            border-left-color: transparent;
+        }
+        .blurred {
+            filter: blur(5px);
+        }
+        .dark-theme {
+            background-color: #1a202c;
+            color: white;
+        }
+    </style>
 </head>
-<body class="bg-white text-black">
+<body id="body">
     <!-- Top Bar -->
-    <div class="flex justify-between items-center p-4 bg-gray-900 text-white">
+    <div id="topBar" class="flex justify-between items-center p-4 bg-gray-900 text-white">
         <div class="flex items-center">
-            <a href="/path-to-given-page">
+            <a href="#" onclick="toggleProfileMenu()">
                 <img src="/path-to-profile-icon.png" alt="Profile Icon" class="h-8 mr-2">
             </a>
         </div>
         <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-md">JOIN PRO</button>
     </div>
 
-    <!-- Input Section at the Bottom -->
-    <div class="fixed bottom-0 w-full bg-white-900 p-3">
-        <!-- Buttons Section at the Bottom -->
-        <div class="container mx-auto px-10 py-8">
-            <div class="flex flex-wrap md:grid md:grid-cols-4 gap-4 overflow-x-auto">
-                <div class="bg-gray-200 text-black px-2 py-4 rounded-lg flex-shrink-0 w-64 md:w-auto">Which writ can be issued against private person also?</div>
-                <div class="bg-gray-200 text-black px-2 py-4 rounded-lg flex-shrink-0 w-64 md:w-auto">Who is considered as the custodian of public purse?</div>
-                <div class="bg-gray-200 text-black px-2 py-4 rounded-lg flex-shrink-0 w-64 md:w-auto">Code of Criminal Procedure is a subject matter of which List?</div>
-                <div class="bg-gray-200 text-black px-2 py-4 rounded-lg flex-shrink-0 w-64 md:w-auto">Which was the first case to introduce the concept of judicial review?</div>
-            </div>
-        </div>
-        <!-- Input Section at the Bottom -->
-        <div class="flex items-center bg-white rounded-md border-2 border-blue-500  w-ful mr-8 ml-8">
-            <div class="flex items-center w-full">
-                <img src="/front_end/images/search.png" alt="Search" class="w-6 h-6 mr-2 ml-5">
-                <input type="text" id="userInput" placeholder="Write a Prompt Here" class="w-full px-4 py-2 text-black focus:outline-none rounded-l-md">
-            </div>
-            <button id="sendButton" class="text-white px-4 py-4 rounded-r-md flex items-center justify-center">
-                <img src="/front_end/images/send-removebg-preview.png" alt="Send" class="w-6 h-6">
-            </button>
+    <!-- Profile Menu -->
+    <div id="profileMenu" class="fixed top-0 left-0 w-64 h-full bg-gray-800 text-white transform -translate-x-full transition-transform duration-300 z-50">
+        <div class="p-4">
+            <h2 class="text-xl mb-4">Profile</h2>
+            <ul>
+                <li class="mb-2"><a href="#" onclick="returnToHome()">HOME</a></li>
+                <li class="mb-2"><a href="/history">History</a></li>
+                <li class="mb-2"><a href="#" onclick="toggleDarkTheme()">Dark Theme</a></li>
+            </ul>
         </div>
     </div>
 
-    <!-- Response Section -->
-    <div id="responseSection" class="container mx-auto px-4 py-4"></div>
+    <!-- Main Content -->
+    <div id="mainContentContainer">
+        <!-- Input Section at the Bottom -->
+        <div id="mainContent" class="fixed bottom-0 w-full bg-white-900 p-3">
+            <!-- Buttons Section at the Bottom -->
+            <div id="suggestionContainer" class="container mx-auto px-10 py-8">
+                <div class="flex flex-nowrap md:grid md:grid-cols-4 gap-4 overflow-x-auto">
+                    <div class="bg-gray-200 text-black px-2 py-4 rounded-lg flex-shrink-0 w-64 md:w-auto" onclick="setInputText(this)">Which writ can be issued against private person also?</div>
+                    <div class="bg-gray-200 text-black px-2 py-4 rounded-lg flex-shrink-0 w-64 md:w-auto" onclick="setInputText(this)">Who is considered as the custodian of public purse?</div>
+                    <div class="bg-gray-200 text-black px-2 py-4 rounded-lg flex-shrink-0 w-64 md:w-auto" onclick="setInputText(this)">Code of Criminal Procedure is a subject matter of which List?</div>
+                    <div class="bg-gray-200 text-black px-2 py-4 rounded-lg flex-shrink-0 w-64 md:w-auto" onclick="setInputText(this)">Which was the first case to introduce the concept of judicial review?</div>
+                </div>
+            </div>
+            <!-- Input Section at the Bottom -->
+            <div class="flex items-center bg-white rounded-md border-2 border-blue-500  w-ful mr-8 ml-8">
+                <div class="flex items-center w-full">
+                    <img src="/front_end/images/search.png" alt="Search" class="w-6 h-6 mr-2 ml-5">
+                    <input type="text" id="userInput" placeholder="Write a Prompt Here" class="w-full px-4 py-2 text-black focus:outline-none rounded-l-md">
+                </div>
+                <button id="sendButton" class="text-white px-4 py-4 rounded-r-md flex items-center justify-center">
+                    <img src="/front_end/images/send-removebg-preview.png" alt="Send" class="w-6 h-6">
+                </button>
+            </div>
+        </div>
+
+        <!-- Response Section -->
+        <div id="responseSection" class="container mx-auto px-4 py-4 w-full flex flex-col items-center"></div>
+    </div>
 
     <script>
+        function toggleProfileMenu() {
+            const profileMenu = document.getElementById('profileMenu');
+            const topBar = document.getElementById('topBar');
+            const mainContentContainer = document.getElementById('mainContentContainer');
+            profileMenu.classList.toggle('-translate-x-full');
+            topBar.classList.toggle('blurred');
+            mainContentContainer.classList.toggle('blurred');
+        }
+
+        function returnToHome() {
+            const profileMenu = document.getElementById('profileMenu');
+            const topBar = document.getElementById('topBar');
+            const mainContentContainer = document.getElementById('mainContentContainer');
+            profileMenu.classList.add('-translate-x-full');
+            topBar.classList.remove('blurred');
+            mainContentContainer.classList.remove('blurred');
+        }
+
+        function toggleDarkTheme() {
+            const body = document.getElementById('body');
+            body.classList.toggle('dark-theme');
+        }
+
+        function setInputText(element) {
+            const userInput = document.getElementById('userInput');
+            userInput.value = element.textContent;
+        }
+
         document.getElementById('sendButton').addEventListener('click', function() {
             const userInput = document.getElementById('userInput').value;
             const responseSection = document.getElementById('responseSection');
 
-            // Simulate a more dynamic response
-            let response = generateResponse(userInput);
+            // Hide the suggestion container
+            const suggestionContainer = document.getElementById('suggestionContainer');
+            suggestionContainer.style.display = 'none';
 
-            // Display the response
-            responseSection.innerHTML += `<div class="bg-gray-200 text-black px-4 py-2 rounded-md mt-4">${response}</div>`;
+            // Create user input element
+            const userInputElement = document.createElement('div');
+            userInputElement.className = 'bg-blue-200 text-black px-4 py-2 rounded-md mt-4 mr-6 self-end flex items-center';
+            userInputElement.innerHTML = `${userInput} <button class="ml-2 text-gray-600" onclick="editInput(this)">Edit</button>`;
+            responseSection.appendChild(userInputElement);
+
+            // Create loading animation
+            const loadingElement = document.createElement('div');
+            loadingElement.className = 'loader mt-4 self-start ml-4';
+            loadingElement.innerHTML = '<div class="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full" role="status"></div>';
+            responseSection.appendChild(loadingElement);
+
+            // Simulate a more dynamic response
+            setTimeout(() => {
+                let response = generateResponse(userInput);
+
+                // Remove loading animation
+                responseSection.removeChild(loadingElement);
+
+                // Create response element
+                const responseElement = document.createElement('div');
+                responseElement.className = 'bg-gray-200 text-black px-4 py-2 rounded-md mt-4 ml-1 self-start flex items-center';
+                responseElement.innerHTML = `${response} 
+                 <button class="ml-2 text-gray-600 w-8 h-8" onclick="copyText(this)">
+                    <img src="/front_end/images/copy.png" alt="Copy">
+                 </button>
+                 <button class="ml-2 text-gray-600 w-8 h-8" onclick="translateText(this)">
+                    <img src="/front_end/images/translate.png" alt="Translate">
+                 </button>
+                 <button class="ml-2 text-gray-600 w-8 h-8" onclick="speakText(this)">
+                    <img src="/front_end/images/speak.png" alt="Speak">
+                 </button>`;
+
+                responseSection.appendChild(responseElement);
+            }, 2000);
+
+            // Clear the input field
+            document.getElementById('userInput').value = '';
         });
 
         function generateResponse(input) {
@@ -66,8 +166,31 @@
             // Randomly select a response
             return responses[Math.floor(Math.random() * responses.length)];
         }
+
+        function editInput(button) {
+            const userInput = document.getElementById('userInput');
+            userInput.value = button.parentElement.textContent.replace('Edit', '').trim();
+            button.parentElement.remove();
+        }
+
+        function copyText(button) {
+            const text = button.parentElement.textContent.replace('Copy', '').replace('Translate', '').replace('Speak', '').trim();
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Text copied to clipboard');
+            });
+        }
+
+        function translateText(button) {
+            const text = button.parentElement.textContent.replace('Copy', '').replace('Translate', '').replace('Speak', '').trim();
+            // Implement translation logic here
+            alert(`Translate: ${text}`);
+        }
+
+        function speakText(button) {
+            const text = button.parentElement.textContent.replace('Copy', '').replace('Translate', '').replace('Speak', '').trim();
+            const utterance = new SpeechSynthesisUtterance(text);
+            speechSynthesis.speak(utterance);
+        }
     </script>
 </body>
 </html>
-
-
