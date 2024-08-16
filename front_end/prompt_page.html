@@ -7,68 +7,67 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-white text-black">
-    <div id="app"></div>
-    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <!-- Top Bar -->
+    <div class="flex justify-between items-center p-4 bg-gray-900 text-white">
+        <div class="flex items-center">
+            <a href="/path-to-given-page">
+                <img src="/path-to-profile-icon.png" alt="Profile Icon" class="h-8 mr-2">
+            </a>
+        </div>
+        <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-md">JOIN PRO</button>
+    </div>
+
+    <!-- Input Section at the Bottom -->
+    <div class="fixed bottom-0 w-full bg-white-900 p-3">
+        <!-- Buttons Section at the Bottom -->
+        <div class="container mx-auto px-10 py-8">
+            <div class="flex flex-wrap md:grid md:grid-cols-4 gap-4 overflow-x-auto">
+                <div class="bg-gray-200 text-black px-2 py-4 rounded-lg flex-shrink-0 w-64 md:w-auto">Which writ can be issued against private person also?</div>
+                <div class="bg-gray-200 text-black px-2 py-4 rounded-lg flex-shrink-0 w-64 md:w-auto">Who is considered as the custodian of public purse?</div>
+                <div class="bg-gray-200 text-black px-2 py-4 rounded-lg flex-shrink-0 w-64 md:w-auto">Code of Criminal Procedure is a subject matter of which List?</div>
+                <div class="bg-gray-200 text-black px-2 py-4 rounded-lg flex-shrink-0 w-64 md:w-auto">Which was the first case to introduce the concept of judicial review?</div>
+            </div>
+        </div>
+        <!-- Input Section at the Bottom -->
+        <div class="flex items-center bg-white rounded-md border-2 border-blue-500  w-ful mr-8 ml-8">
+            <div class="flex items-center w-full">
+                <img src="/front_end/images/search.png" alt="Search" class="w-6 h-6 mr-2 ml-5">
+                <input type="text" id="userInput" placeholder="Write a Prompt Here" class="w-full px-4 py-2 text-black focus:outline-none rounded-l-md">
+            </div>
+            <button id="sendButton" class="text-white px-4 py-4 rounded-r-md flex items-center justify-center">
+                <img src="/front_end/images/send-removebg-preview.png" alt="Send" class="w-6 h-6">
+            </button>
+        </div>
+    </div>
+
+    <!-- Response Section -->
+    <div id="responseSection" class="container mx-auto px-4 py-4"></div>
+
     <script>
-        new Vue({
-            el: '#app',
-            data: {
-                userInput: '',
-                responses: []
-            },
-            methods: {
-                sendResponse() {
-                    const response = this.generateResponse(this.userInput);
-                    this.responses.push(response);
-                    this.userInput = '';
-                },
-                generateResponse(input) {
-                    const responses = [
-                        `You asked about "${input}". Here's some information: ...`,
-                        `Interesting question about "${input}". Let's dive into it: ...`,
-                        `Regarding "${input}", here's what I found: ...`,
-                        `That's a great question about "${input}". Here's my take: ...`
-                    ];
-                    return responses[Math.floor(Math.random() * responses.length)];
-                }
-            },
-            template: `
-                <div class="bg-white text-black">
-                    <!-- Top Bar -->
-                    <div class="flex justify-between items-center p-4 bg-gray-900 text-white">
-                        <div class="flex items-center">
-                            <a href="/path-to-given-page">
-                                <img src="/path-to-profile-icon.png" alt="Profile Icon" class="h-8 mr-2">
-                            </a>
-                        </div>
-                        <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-md">JOIN PRO</button>
-                    </div>
+        document.getElementById('sendButton').addEventListener('click', function() {
+            const userInput = document.getElementById('userInput').value;
+            const responseSection = document.getElementById('responseSection');
 
-                    <!-- Input Section at the Bottom -->
-                    <div class="fixed bottom-0 w-full bg-white-900 p-4">
-                        <!-- Buttons Section at the Bottom -->
-                        <div class="container mx-auto px-2 py-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <button class="bg-gray-200 text-black px-2 py-4 rounded-md">Which writ can be issued against private person also?</button>
-                            <button class="bg-gray-200 text-black px-2 py-4 rounded-md">Who is considered as the custodian of public purse?</button>
-                            <button class="bg-gray-200 text-black px-2 py-4 rounded-md">Code of Criminal Procedure is a subject matter of which List?</button>
-                            <button class="bg-gray-200 text-black px-2 py-2 rounded-md">Which was the first case to introduce the concept of judicial review?</button>
-                        </div>
-                        <!-- Input Section at the Bottom -->
-                        <div class="flex items-center bg-gray-800 rounded-md">
-                            <input type="text" v-model="userInput" placeholder="Write a Prompt Here" class="w-full px-4 py-2 bg-gray-800 text-white focus:outline-none rounded-l-md">
-                            <button @click="sendResponse" class="bg-blue-500 text-white px-4 py-4 rounded-r-md">Send</button>
-                        </div>
-                    </div>
+            // Simulate a more dynamic response
+            let response = generateResponse(userInput);
 
-                    <!-- Response Section -->
-                    <div class="container mx-auto px-4 py-4">
-                        <div v-for="response in responses" class="bg-gray-200 text-black px-4 py-2 rounded-md mt-4">
-                            {{ response }}
-                        </div>
-                    </div>
-                </div>
-            `
+            // Display the response
+            responseSection.innerHTML += `<div class="bg-gray-200 text-black px-4 py-2 rounded-md mt-4">${response}</div>`;
         });
+
+        function generateResponse(input) {
+            // Basic LLM-like response logic
+            const responses = [
+                `You asked about "${input}". Here's some information: ...`,
+                `Interesting question about "${input}". Let's dive into it: ...`,
+                `Regarding "${input}", here's what I found: ...`,
+                `That's a great question about "${input}". Here's my take: ...`
+            ];
+            // Randomly select a response
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
     </script>
 </body>
 </html>
+
+
