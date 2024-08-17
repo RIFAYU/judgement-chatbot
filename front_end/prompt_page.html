@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prompt Page</title>
+    <title>LAW GPT</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
     <style>
         .loader {
@@ -16,6 +16,16 @@
             border-right-color: transparent;
             border-bottom-color: transparent;
             border-left-color: transparent;
+            border-width: 4px;
+            width: 2rem;
+            height: 2rem;
+            border-style: solid;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         .blurred {
             filter: blur(5px);
@@ -24,9 +34,53 @@
             background-color: #1a202c;
             color: white;
         }
+        .chat-bubble {
+            max-width: 60%;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+        .user-bubble {
+            background-color: #3498db;
+            color: white;
+            align-self: flex-end;
+        }
+        .bot-bubble {
+            background-color: #e0e0e0;
+            color: black;
+            align-self: flex-start;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        .action-buttons button {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+        .dark-theme .bg-white {
+            background-color: #2d3748 !important;
+        }
+        .dark-theme .text-black {
+            color: rgb(17, 10, 10) !important;
+        }
+        .dark-theme .border-blue-500 {
+            border-color: #63b3ed !important;
+        }
+        .dark-theme input[type="text"] {
+            background-color: #2d3748;
+            color: white;
+        }
+        .dark-theme button {
+            background-color: #2d3748;
+            color: white;
+        }
     </style>
 </head>
-<body id="body">
+<body id="body" class="flex flex-col h-screen">
     <!-- Top Bar -->
     <div id="topBar" class="flex justify-between items-center p-4 bg-gray-900 text-white">
         <div class="flex items-center">
@@ -50,9 +104,14 @@
     </div>
 
     <!-- Main Content -->
-    <div id="mainContentContainer">
+    <div id="mainContentContainer" class="flex flex-col flex-grow overflow-hidden">
+        <!-- Response Section -->
+        <div id="responseSection" class="flex flex-col flex-grow overflow-y-auto p-4">
+            <!-- Chat bubbles will be appended here -->
+        </div>
+
         <!-- Input Section at the Bottom -->
-        <div id="mainContent" class="fixed bottom-0 w-full bg-white-900 p-3">
+        <div id="mainContent" class="bg-white p-3">
             <!-- Buttons Section at the Bottom -->
             <div id="suggestionContainer" class="container mx-auto px-10 py-8">
                 <div class="flex flex-nowrap md:grid md:grid-cols-4 gap-4 overflow-x-auto">
@@ -63,19 +122,19 @@
                 </div>
             </div>
             <!-- Input Section at the Bottom -->
-            <div class="flex items-center bg-white rounded-md border-2 border-blue-500  w-ful mr-8 ml-8">
+            <div class="flex items-center bg-white rounded-md border-2 border-blue-500 w-full">
                 <div class="flex items-center w-full">
                     <img src="/front_end/images/search.png" alt="Search" class="w-6 h-6 mr-2 ml-5">
                     <input type="text" id="userInput" placeholder="Write a Prompt Here" class="w-full px-4 py-2 text-black focus:outline-none rounded-l-md">
                 </div>
+                <button id="attacheButton" class="text-white px-4 py-4 rounded-r-md flex items-center justify-center">
+                    <img src="/front_end/images/attache.png" alt="Send" class="w-6 h-6">
+                </button>
                 <button id="sendButton" class="text-white px-4 py-4 rounded-r-md flex items-center justify-center">
                     <img src="/front_end/images/send-removebg-preview.png" alt="Send" class="w-6 h-6">
                 </button>
             </div>
         </div>
-
-        <!-- Response Section -->
-        <div id="responseSection" class="container mx-auto px-4 py-4 w-full flex flex-col items-center"></div>
     </div>
 
     <script>
@@ -108,8 +167,13 @@
         }
 
         document.getElementById('sendButton').addEventListener('click', function() {
-            const userInput = document.getElementById('userInput').value;
+            const userInput = document.getElementById('userInput').value.trim();
             const responseSection = document.getElementById('responseSection');
+
+            // Check if input is empty
+            if (userInput === '') {
+                return;
+            }
 
             // Hide the suggestion container
             const suggestionContainer = document.getElementById('suggestionContainer');
@@ -117,15 +181,18 @@
 
             // Create user input element
             const userInputElement = document.createElement('div');
-            userInputElement.className = 'bg-blue-200 text-black px-4 py-2 rounded-md mt-4 mr-6 self-end flex items-center';
+            userInputElement.className = 'chat-bubble user-bubble';
             userInputElement.innerHTML = `${userInput} <button class="ml-2 text-gray-600" onclick="editInput(this)">Edit</button>`;
             responseSection.appendChild(userInputElement);
 
             // Create loading animation
             const loadingElement = document.createElement('div');
             loadingElement.className = 'loader mt-4 self-start ml-4';
-            loadingElement.innerHTML = '<div class="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full" role="status"></div>';
+            loadingElement.innerHTML = '<div class="spinner-border" role="status"></div>';
             responseSection.appendChild(loadingElement);
+
+            // Scroll to the bottom of the response section
+            responseSection.scrollTop = responseSection.scrollHeight;
 
             // Simulate a more dynamic response
             setTimeout(() => {
@@ -136,19 +203,24 @@
 
                 // Create response element
                 const responseElement = document.createElement('div');
-                responseElement.className = 'bg-gray-200 text-black px-4 py-2 rounded-md mt-4 ml-1 self-start flex items-center';
+                responseElement.className = 'chat-bubble bot-bubble';
                 responseElement.innerHTML = `${response} 
-                 <button class="ml-2 text-gray-600 w-8 h-8" onclick="copyText(this)">
-                    <img src="/front_end/images/copy.png" alt="Copy">
-                 </button>
-                 <button class="ml-2 text-gray-600 w-8 h-8" onclick="translateText(this)">
-                    <img src="/front_end/images/translate.png" alt="Translate">
-                 </button>
-                 <button class="ml-2 text-gray-600 w-8 h-8" onclick="speakText(this)">
-                    <img src="/front_end/images/speak.png" alt="Speak">
-                 </button>`;
+                 <div class="action-buttons">
+                    <button onclick="copyText(this)">
+                        <img src="/front_end/images/copy.png" alt="Copy" class="w-6 h-6 justify-center">
+                    </button>
+                    <button onclick="translateText(this)">
+                        <img src="/front_end/images/translate.png" alt="Translate" class="w-6 h-6">
+                    </button>
+                    <button onclick="speakText(this)">
+                        <img src="/front_end/images/speak.png" alt="Speak" class="w-6 h-6">
+                    </button>
+                 </div>`;
 
                 responseSection.appendChild(responseElement);
+
+                // Scroll to the bottom of the response section
+                responseSection.scrollTop = responseSection.scrollHeight;
             }, 2000);
 
             // Clear the input field
@@ -174,20 +246,20 @@
         }
 
         function copyText(button) {
-            const text = button.parentElement.textContent.replace('Copy', '').replace('Translate', '').replace('Speak', '').trim();
+            const text = button.parentElement.parentElement.textContent.replace('Copy', '').replace('Translate', '').replace('Speak', '').trim();
             navigator.clipboard.writeText(text).then(() => {
                 alert('Text copied to clipboard');
             });
         }
 
         function translateText(button) {
-            const text = button.parentElement.textContent.replace('Copy', '').replace('Translate', '').replace('Speak', '').trim();
+            const text = button.parentElement.parentElement.textContent.replace('Copy', '').replace('Translate', '').replace('Speak', '').trim();
             // Implement translation logic here
             alert(`Translate: ${text}`);
         }
 
         function speakText(button) {
-            const text = button.parentElement.textContent.replace('Copy', '').replace('Translate', '').replace('Speak', '').trim();
+            const text = button.parentElement.parentElement.textContent.replace('Copy', '').replace('Translate', '').replace('Speak', '').trim();
             const utterance = new SpeechSynthesisUtterance(text);
             speechSynthesis.speak(utterance);
         }
